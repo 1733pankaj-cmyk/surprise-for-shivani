@@ -1,4 +1,4 @@
-<meta name='viewport' content='width=device-width, initial-scale=1'/><!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -217,47 +217,33 @@
   </div>
 
   <script>
-    // 1. App Initialization (Fixed Scroll Issue + Proper Flow)
     document.addEventListener("DOMContentLoaded", function() {
       createBackground();
-      
-      // Prevent scrolling while intro is active
       document.body.style.overflow = "hidden";
       
       setTimeout(() => {
         const intro = document.getElementById("intro-screen");
         const main = document.getElementById("main-content");
         
-        // 1. Fade out intro
         intro.style.opacity = "0"; 
         
         setTimeout(() => {
-          // 2. Hide intro completely
           intro.style.display = "none";
-          
-          // 3. Make main content block but keep invisible
           main.classList.remove("hidden");
-          
-          // 4. VERY IMPORTANT: Scroll to absolute top
           window.scrollTo({ top: 0, behavior: 'instant' });
-          
-          // 5. Restore scrollability
           document.body.style.overflow = "auto";
           document.body.style.overflowX = "hidden";
           
-          // 6. Fade in main content smoothly
           setTimeout(() => {
             main.style.opacity = "1";
-            // Start typewriter a little after it becomes visible
             setTimeout(typeWriter, 800); 
           }, 100);
           
-        }, 1000); // Wait for fade out to complete
+        }, 1000); 
 
-      }, 2500); // How long Intro stays on screen
+      }, 2500); 
     });
 
-    // 2. Typewriter Effect
     const fullText = "Shivani... mujhe pata hai maine tumhe hurt kiya 😔 But honestly, tum meri life ke un logon mein se ho jo genuinely matter karte hain. Main bas tumhari smile wapas dekhna chahta hu 💖";
     let index = 0;
     const speed = 40; 
@@ -270,7 +256,6 @@
       }
     }
 
-    // 3. Music Player
     const bgMusic = document.getElementById("bgMusic");
     let isPlaying = false;
 
@@ -290,7 +275,6 @@
       isPlaying = !isPlaying;
     }
 
-    // 4. Background Emojis (Flowers & Hearts)
     function createBackground() {
       const container = document.getElementById("bg-elements");
       const emojis = ["❤️", "💖", "🌸", "🌷", "✨", "💕", "🌺"]; 
@@ -310,7 +294,6 @@
       }
     }
 
-    // 5. Smooth Surprise Reveal
     function showSurprise() {
       const msgBox = document.getElementById("surprise-message");
       msgBox.classList.remove("hidden");
@@ -318,14 +301,13 @@
       
       createMiniHeartExplosion();
       
-      // Scroll down smoothly to show the surprise message fully
       setTimeout(() => {
         msgBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }, 100);
     }
 
-    // 6. Send Email via FormSubmit AJAX
-    async function sendReply() {
+    // FIXED SEND MESSAGE LOGIC
+    function sendReply() {
       const msg = document.getElementById("replyText").value.trim();
       if (!msg) {
         alert("Kuch toh likh do please... 🥺");
@@ -334,36 +316,48 @@
 
       const btn = document.getElementById("sendBtn");
       btn.innerHTML = `<span>Sending...</span> <span>⏳</span>`;
-      btn.disabled = true;
 
-      try {
-        await fetch("https://formsubmit.co/ajax/1733pankaj@gmail.com", {
-          method: "POST",
-          headers: { 
-              'Content-Type': 'application/json',
-              'Accept': 'application/json'
-          },
-          body: JSON.stringify({
-              message: msg,
-              _subject: "Reply from Shivani's Surprise Page ❤️"
-          })
-        });
+      // Ek hidden HTML form banayenge jo new tab mein khulega
+      const form = document.createElement("form");
+      form.method = "POST";
+      form.action = "https://formsubmit.co/1733pankaj@gmail.com";
+      form.target = "_blank"; // Naye tab mein khulega
 
-        // Show Success UI
+      // Message add karo
+      const msgInput = document.createElement("input");
+      msgInput.type = "hidden";
+      msgInput.name = "Shivani_Ka_Message";
+      msgInput.value = msg;
+      form.appendChild(msgInput);
+
+      // Subject add karo
+      const subjectInput = document.createElement("input");
+      subjectInput.type = "hidden";
+      subjectInput.name = "_subject";
+      subjectInput.value = "Reply from Shivani's Surprise Page ❤️";
+      form.appendChild(subjectInput);
+
+      // Captcha disable (optional)
+      const captchaInput = document.createElement("input");
+      captchaInput.type = "hidden";
+      captchaInput.name = "_captcha";
+      captchaInput.value = "false";
+      form.appendChild(captchaInput);
+
+      // Form ko submit karo
+      document.body.appendChild(form);
+      form.submit();
+      document.body.removeChild(form);
+
+      // Original tab par Success animation dikhao
+      setTimeout(() => {
         document.getElementById("replyFormContainer").classList.add("hidden");
         document.getElementById("successMessage").classList.remove("hidden");
         document.getElementById("successMessage").classList.add("smooth-show");
-        
         createMegaHeartExplosion();
-
-      } catch (error) {
-        alert("Oh no, message send nahi hua. Aap mujhe direct WhatsApp kar do please! 🥺");
-        btn.innerHTML = `<span>Send Message</span> <span>🚀</span>`;
-        btn.disabled = false;
-      }
+      }, 500);
     }
 
-    // 7. Click & Send Animations
     function createMiniHeartExplosion() {
       for(let i=0; i<15; i++) spawnFloatingHeart();
     }
